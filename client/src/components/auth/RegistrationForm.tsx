@@ -45,7 +45,7 @@ interface EmployerFormData extends BaseFormData {
   }
 }
 
-type RegistrationFormData = UserFormData | EmployerFormData
+export type RegistrationFormData = UserFormData | EmployerFormData
 
 interface RegistrationFormProps {
   onSubmit: (data: RegistrationFormData & { userType: UserType }) => Promise<void>

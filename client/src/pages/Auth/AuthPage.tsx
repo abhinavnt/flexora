@@ -4,7 +4,7 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { LoginForm } from "@/components/auth/LoginForm"
-import { RegistrationForm } from "@/components/auth/RegistrationForm"
+import { RegistrationForm, type RegistrationFormData } from "@/components/auth/RegistrationForm"
 
 type AuthMode = "login" | "register"
 
@@ -29,7 +29,9 @@ export default function AuthPage() {
     }
   }
 
-  const handleRegistration = async (data: any) => {
+  const handleRegistration = async (data: RegistrationFormData) => {
+    console.log("data from the register",data);
+    
     setLoading(true)
     setError("")
 

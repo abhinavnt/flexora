@@ -3,7 +3,7 @@
 
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "../../client/src/hooks/ThemeProvider";
-import AuthPage from "./pages/AuthPage";
+import AuthPage from "./pages/Auth/AuthPage";
 
 const App = () => (
   // <QueryClientProvider client={queryClient}>
