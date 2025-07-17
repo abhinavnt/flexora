@@ -16,6 +16,7 @@ interface BaseFormData {
   email: string
   password: string
   phone: string
+  role:UserType
 }
 
 interface UserFormData extends BaseFormData {
@@ -45,7 +46,7 @@ interface EmployerFormData extends BaseFormData {
   }
 }
 
-type RegistrationFormData = UserFormData | EmployerFormData
+export type RegistrationFormData = UserFormData | EmployerFormData
 
 interface RegistrationFormProps {
   onSubmit: (data: RegistrationFormData & { userType: UserType }) => Promise<void>
@@ -84,6 +85,7 @@ export function RegistrationForm({ onSubmit, loading = false, error }: Registrat
     email: "",
     password: "",
     phone: "",
+    role:userType,
     ...(userType === "user"
       ? {
           skills: "",
@@ -154,6 +156,7 @@ export function RegistrationForm({ onSubmit, loading = false, error }: Registrat
       email: "",
       password: "",
       phone: "",
+      role:userType,
       ...(type === "user"
         ? {
             skills: "",

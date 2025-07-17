@@ -4,21 +4,27 @@ import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db";
-import morgan from "morgan";
 import { errorHandler } from "./middlewares/errorMiddleware";
 import authRoutes from "./routes/auth.routes"
+import logger from "./utils/logger";
 
 dotenv.config();
 connectDB();
-console.log("mongo db conected");
+logger.info("mongo db conected");
 
 const app = express();
 const CLIENT_URL = process.env.CLIENT_URL;
 
-app.use(morgan("dev"));
 
 app.use(express.json());
 app.use(cookieParser());
+
+// Request Logger
+app.use((req, res, next) => {
+  logger.info(`${req.method} ${req.url}`);
+  next();
+});
+
 
 const allowedOrigins = [
   CLIENT_URL,
