@@ -4,9 +4,10 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { LoginForm } from "@/components/auth/LoginForm"
-import { RegistrationForm, type RegistrationFormData } from "@/components/auth/RegistrationForm"
 import { registerUser } from "@/services/authService"
 import { useNavigate } from "react-router-dom"
+import type { RegistrationFormData } from "@/hooks/auth/useRegistrationForm"
+import { RegistrationForm } from "@/components/auth/RegistrationForm"
 
 type AuthMode = "login" | "register"
 

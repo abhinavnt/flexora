@@ -1,148 +1,26 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { verifyOtp } from "@/services/authService";
-import { useDispatch } from "react-redux";
-
-const OTP_LENGTH = 6;
-const RESEND_TIME_SECONDS = 60;
-const MAX_TIMER_PERSISTENCE_MINUTES = 5; // Max time to persist timer across "leaves"
+import { useLocation } from "react-router-dom";
+import { useOtp } from "@/hooks/auth/useOtp";
+import { formatTime, OTP_LENGTH } from "@/utils/auth/otpUtils";
 
 export default function OtpPage() {
-  const [otp, setOtp] = useState<string[]>(new Array(OTP_LENGTH).fill(""));
-  const [timeLeft, setTimeLeft] = useState(RESEND_TIME_SECONDS);
-  const [isResending, setIsResending] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const inputRefs = useRef<Array<HTMLInputElement | null>>(new Array(OTP_LENGTH).fill(null));
   const location = useLocation();
   const email = location.state?.email || "your email";
-  const dispatch = useDispatch();
-  const navigate = useNavigate()
-
-  const startTimer = useCallback(() => {
-    setIsResending(true);
-    setHasError(false); // Clear error on new timer start
-
-    const storedEndTime = localStorage.getItem("otpTimerEndTime");
-    let initialTimeLeft = RESEND_TIME_SECONDS;
-
-    if (storedEndTime) {
-      const endTime = Number.parseInt(storedEndTime, 10);
-      const now = Date.now();
-      const remaining = Math.round((endTime - now) / 1000);
-
-      if (remaining > 0 && remaining <= RESEND_TIME_SECONDS + MAX_TIMER_PERSISTENCE_MINUTES * 60) {
-        initialTimeLeft = remaining;
-      } else {
-        localStorage.removeItem("otpTimerEndTime");
-      }
-    }
-
-    setTimeLeft(initialTimeLeft);
-
-    if (!storedEndTime || initialTimeLeft === RESEND_TIME_SECONDS) {
-      localStorage.setItem("otpTimerEndTime", (Date.now() + RESEND_TIME_SECONDS * 1000).toString());
-    }
-
-    const timerInterval = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        if (prevTime <= 1) {
-          clearInterval(timerInterval);
-          setIsResending(false);
-          localStorage.removeItem("otpTimerEndTime");
-          return 0;
-        }
-        return prevTime - 1;
-      });
-    }, 1000);
-
-    return () => clearInterval(timerInterval);
-  }, []);
-
-  useEffect(() => {
-    const cleanup = startTimer();
-    return cleanup;
-  }, [startTimer]);
-
-  const handleChange = (element: HTMLInputElement, index: number, value: string) => {
-    setHasError(false);
-
-    if (value.length > 1) {
-      if (value.length === OTP_LENGTH && /^\d+$/.test(value)) {
-        const newOtp = value.split("");
-        setOtp(newOtp);
-        inputRefs.current[OTP_LENGTH - 1]?.focus();
-      }
-      return;
-    }
-
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
-
-    if (value !== "" && index < OTP_LENGTH - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-    if (e.key === "Backspace" && otp[index] === "" && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    } else if (e.key === "ArrowLeft" && index > 0) {
-      inputRefs.current[index - 1]?.focus();
-    } else if (e.key === "ArrowRight" && index < OTP_LENGTH - 1) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    const pasteData = e.clipboardData.getData("text").trim();
-    if (pasteData.length === OTP_LENGTH && /^\d+$/.test(pasteData)) {
-      const newOtp = pasteData.split("");
-      setOtp(newOtp);
-      inputRefs.current[OTP_LENGTH - 1]?.focus();
-      setHasError(false);
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    const enteredOtp = otp.join("");
-
-
-    try {
-      const response = await verifyOtp(email, enteredOtp, dispatch)
-
-      if (response.status == 200) {
-        setHasError(false);
-        setOtp(new Array(OTP_LENGTH).fill(""));
-        localStorage.removeItem("otpTimerEndTime");
-        if (response.data.user.role == 'user') {
-          console.log("going to user route");
-          navigate("/")
-        }
-
-      }
-      setHasError(true)
-      return
-    } catch (error) {
-      setHasError(true)
-    }
-  };
-
-  const handleResendOtp = () => {
-    setOtp(new Array(OTP_LENGTH).fill(""));
-    startTimer();
-  };
-
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes.toString().padStart(2, "0")}:${remainingSeconds.toString().padStart(2, "0")}`;
-  };
+  const {
+    otp,
+    inputRefs,
+    timeLeft,
+    isResending,
+    hasError,
+    handleChange,
+    handleKeyDown,
+    handlePaste,
+    handleVerifyOtp,
+    handleResendOtp,
+  } = useOtp(email);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-950 p-4">
@@ -160,12 +38,12 @@ export default function OtpPage() {
               <Input
                 key={index}
                 ref={(el) => {
-                  inputRefs.current[index] = el;
+                  inputRefs.current[index] = el as HTMLInputElement | null;
                 }}
                 type="text"
                 maxLength={1}
                 value={digit}
-                onChange={(e) => handleChange(e.target, index, e.target.value)}
+                onChange={(e) => handleChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
                 onPaste={handlePaste}
                 className={cn(
