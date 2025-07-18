@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { LoginForm } from "@/components/auth/LoginForm"
 import { RegistrationForm, type RegistrationFormData } from "@/components/auth/RegistrationForm"
 import { registerUser } from "@/services/authService"
+import { useNavigate } from "react-router-dom"
 
 type AuthMode = "login" | "register"
 
@@ -13,6 +14,8 @@ export default function AuthPage() {
   const [authMode, setAuthMode] = useState<AuthMode>("login")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>("")
+
+  const navigate=useNavigate()
 
   const handleLogin = async (data: { email: string; password: string }) => {
     setLoading(true)
@@ -39,6 +42,24 @@ export default function AuthPage() {
     try {
       // Simulate API call
      const response= await registerUser(data)
+
+      if (response?.status == 201) {
+        navigate('/otp', {
+          state: {
+            email: data.email,
+            // userType: userType
+          }
+        });
+      }
+      // Navigate to OTP verification page with email
+      console.log(response,"rspon");
+
+      if(response==undefined){
+
+        setError("something went wrong please try later")
+      }
+      
+      setError(response.data.message)
      console.log("response",response);
      
       console.log("Registration data:", data)
