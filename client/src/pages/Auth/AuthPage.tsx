@@ -1,95 +1,97 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { ThemeToggle } from "@/components/ui/ThemeToggle"
-import { LoginForm } from "@/components/auth/LoginForm"
-import { login, registerUser } from "@/services/authService"
-import { useNavigate } from "react-router-dom"
-import { RegistrationForm } from "@/components/auth/RegistrationForm"
-import { useDispatch } from "react-redux"
-import type { AuthMode, RegistrationFormData } from "@/types/auth"
-
-
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { LoginForm } from "@/components/auth/LoginForm";
+import { login, registerUser } from "@/services/authService";
+import { useNavigate, Navigate } from "react-router-dom";
+import { RegistrationForm } from "@/components/auth/RegistrationForm";
+import { useDispatch, useSelector } from "react-redux";
+import type { AuthMode, RegistrationFormData } from "@/types/auth";
+import type { RootState } from "@/redux/store";
 
 export default function AuthPage() {
-  const [authMode, setAuthMode] = useState<AuthMode>("login")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string>("")
+  const [authMode, setAuthMode] = useState<AuthMode>("login");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>("");
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { isAuthenticated, user } = useSelector((state: RootState) => state.auth);
 
-  const dispatch = useDispatch()
-
-  const handleLogin = async (data: { email: string; password: string }) => {
-    setLoading(true)
-    setError("")
-
-    try {
-      // Simulate API call
-      const response = await login(data.email, data.password, dispatch)
-      console.log("Login data:", data)
-      if (response.status == 200) {
-
-        navigate('/')
-        return
-      }
-
-      if (response == undefined) {
-        setError("something went wrong please try later")
-        return
-      }
-      setError(response.data.message)
-      // Handle successful login
-    } catch (err) {
-      setError("Invalid email or password. Please try again.")
-    } finally {
-      setLoading(false)
+  // Redirect authenticated users based on role
+  if (isAuthenticated) {
+    if (user?.role === "user") {
+      return <Navigate to="/" replace />;
+    } else if (user?.role === "employer") {
+      return <Navigate to="/employer" replace />;
+    } else if (user?.role === "admin") {
+      return <Navigate to="/admin" replace />;
     }
   }
+
+  const handleLogin = async (data: { email: string; password: string }) => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await login(data.email, data.password, dispatch);
+      console.log("Login data:", data);
+      if (response.status === 200) {
+        if (response.data.user.role === "user") {
+          navigate("/");
+        } else if (response.data.user.role === "employer") {
+          navigate("/employer");
+        } else if (response.data.user.role === "admin") {
+          navigate("/admin");
+        }
+      }
+
+      if (response === undefined) {
+        setError("Something went wrong, please try later");
+        return;
+      }
+      setError(response.data.message);
+    } catch (err) {
+      setError("Invalid email or password. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleRegistration = async (data: RegistrationFormData) => {
     console.log("data from the register", data);
-
-    setLoading(true)
-    setError("")
+    setLoading(true);
+    setError("");
 
     try {
-      // Simulate API call
-      const response = await registerUser(data)
-
-      if (response?.status == 201) {
-        navigate('/otp', {
+      const response = await registerUser(data);
+      if (response?.status === 201) {
+        navigate("/otp", {
           state: {
             email: data.email,
-            // userType: userType
-          }
+          },
         });
       }
-      // Navigate to OTP verification page with email
       console.log(response, "rspon");
-
-      if (response == undefined) {
-
-        setError("something went wrong please try later")
+      if (response === undefined) {
+        setError("Something went wrong, please try later");
       }
-
-      setError(response.data.message)
+      setError(response.data.message);
       console.log("response", response);
-
-      console.log("Registration data:", data)
-      // Handle successful registration
+      console.log("Registration data:", data);
     } catch (err) {
-      setError("Registration failed. Please try again.")
+      setError("Registration failed. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const switchMode = (mode: AuthMode) => {
-    setAuthMode(mode)
-    setError("")
-  }
+    setAuthMode(mode);
+    setError("");
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-gray-50 to-gray-100 dark:from-black dark:via-black dark:to-gray-900 relative overflow-hidden">
@@ -147,10 +149,11 @@ export default function AuthPage() {
                 <motion.button
                   key={mode}
                   onClick={() => switchMode(mode)}
-                  className={`px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 ${authMode === mode
+                  className={`px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
+                    authMode === mode
                       ? "bg-black text-white shadow-md dark:bg-white dark:text-black"
                       : "text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
-                    }`}
+                  }`}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -200,5 +203,5 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

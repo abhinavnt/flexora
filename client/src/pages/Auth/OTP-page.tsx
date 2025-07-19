@@ -2,13 +2,19 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { useLocation } from "react-router-dom";
+import { useLocation, Navigate } from "react-router-dom";
 import { useOtp } from "@/hooks/auth/useOtp";
 import { formatTime, OTP_LENGTH } from "@/utils/auth/otpUtils";
 
 export default function OtpPage() {
   const location = useLocation();
-  const email = location.state?.email || "your email";
+
+  // Redirect to /auth if email is not provided in state
+  if (!location.state?.email) {
+    return <Navigate to="/auth" replace />
+  }
+
+  const email = location.state.email;
   const {
     otp,
     inputRefs,
