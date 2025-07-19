@@ -1,79 +1,26 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
 import { motion } from "framer-motion"
 import { Mail, Lock, LogIn } from "lucide-react"
-import { useFormValidation, type ValidationRules } from "../../hooks/useFormValidation"
 import { InputField } from "../ui/input-field"
 import { GoogleIcon } from "../ui/GoogleIcon"
+import type { LoginFormProps } from "@/types/auth"
+import { useLoginForm } from "@/hooks/auth/useLoginForm"
 
-const validationRules: ValidationRules = {
-  email: {
-    required: true,
-    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-  },
-  password: {
-    required: true,
-    minLength: 6,
-  },
-}
 
-interface LoginFormData {
-  email: string
-  password: string
-}
-
-interface LoginFormProps {
-  onSubmit: (data: LoginFormData) => Promise<void>
-  loading?: boolean
-  error?: string
-}
 
 export function LoginForm({ onSubmit, loading = false, error }: LoginFormProps) {
-  const [formData, setFormData] = useState<LoginFormData>({
-    email: "",
-    password: "",
-  })
-
-  const { errors, validateForm, handleFieldChange, handleFieldBlur } = useFormValidation(validationRules)
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (validateForm(formData as unknown as { [key: string]: string })) {
-      await onSubmit(formData)
-    }
-  }
-
-  const handleInputChange = (field: keyof LoginFormData) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value
-    setFormData((prev) => ({ ...prev, [field]: value }))
-    handleFieldChange(field, value)
-  }
-
-  const handleInputBlur = (field: keyof LoginFormData) => (e: React.FocusEvent<HTMLInputElement>) => {
-    handleFieldBlur(field, e.target.value)
-  }
+  const { formData, errors, handleInputChange, handleInputBlur, handleSubmit } = useLoginForm(onSubmit)
 
   const handleGoogleAuth = () => {
     console.log("Google authentication clicked")
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6 }}
-      className="w-full max-w-md mx-auto"
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="w-full max-w-md mx-auto">
       <div className="bg-white dark:bg-black p-8 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-800 space-y-6">
         <div className="text-center space-y-2">
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-          >
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring", stiffness: 200 }}>
             <LogIn className="h-12 w-12 mx-auto text-black dark:text-white" />
           </motion.div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Welcome back</h1>
@@ -81,11 +28,7 @@ export function LoginForm({ onSubmit, loading = false, error }: LoginFormProps) 
         </div>
 
         {error && (
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400"
-          >
+          <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-sm text-red-600 dark:text-red-400">
             {error}
           </motion.div>
         )}

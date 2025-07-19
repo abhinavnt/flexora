@@ -4,19 +4,22 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { LoginForm } from "@/components/auth/LoginForm"
-import { registerUser } from "@/services/authService"
+import { login, registerUser } from "@/services/authService"
 import { useNavigate } from "react-router-dom"
-import type { RegistrationFormData } from "@/hooks/auth/useRegistrationForm"
 import { RegistrationForm } from "@/components/auth/RegistrationForm"
+import { useDispatch } from "react-redux"
+import type { AuthMode, RegistrationFormData } from "@/types/auth"
 
-type AuthMode = "login" | "register"
+
 
 export default function AuthPage() {
   const [authMode, setAuthMode] = useState<AuthMode>("login")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string>("")
 
-  const navigate=useNavigate()
+  const navigate = useNavigate()
+
+  const dispatch = useDispatch()
 
   const handleLogin = async (data: { email: string; password: string }) => {
     setLoading(true)
@@ -24,8 +27,19 @@ export default function AuthPage() {
 
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const response = await login(data.email, data.password, dispatch)
       console.log("Login data:", data)
+      if (response.status == 200) {
+
+        navigate('/')
+        return
+      }
+
+      if (response == undefined) {
+        setError("something went wrong please try later")
+        return
+      }
+      setError(response.data.message)
       // Handle successful login
     } catch (err) {
       setError("Invalid email or password. Please try again.")
@@ -35,14 +49,14 @@ export default function AuthPage() {
   }
 
   const handleRegistration = async (data: RegistrationFormData) => {
-    console.log("data from the register",data);
-    
+    console.log("data from the register", data);
+
     setLoading(true)
     setError("")
 
     try {
       // Simulate API call
-     const response= await registerUser(data)
+      const response = await registerUser(data)
 
       if (response?.status == 201) {
         navigate('/otp', {
@@ -53,16 +67,16 @@ export default function AuthPage() {
         });
       }
       // Navigate to OTP verification page with email
-      console.log(response,"rspon");
+      console.log(response, "rspon");
 
-      if(response==undefined){
+      if (response == undefined) {
 
         setError("something went wrong please try later")
       }
-      
+
       setError(response.data.message)
-     console.log("response",response);
-     
+      console.log("response", response);
+
       console.log("Registration data:", data)
       // Handle successful registration
     } catch (err) {
@@ -133,11 +147,10 @@ export default function AuthPage() {
                 <motion.button
                   key={mode}
                   onClick={() => switchMode(mode)}
-                  className={`px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 ${
-                    authMode === mode
+                  className={`px-8 py-3 rounded-full text-sm font-medium transition-all duration-300 ${authMode === mode
                       ? "bg-black text-white shadow-md dark:bg-white dark:text-black"
                       : "text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white"
-                  }`}
+                    }`}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >

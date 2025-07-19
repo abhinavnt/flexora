@@ -3,17 +3,10 @@
 import { useEffect, useState } from "react";
 import { useFormValidation, type ValidationRules } from "../useFormValidation";
 import { useLocation } from "../useLocation";
+import type { RegistrationFormData, UserType } from "@/types/auth";
 
-type UserType = "user" | "employer";
 
-export interface RegistrationFormData {
-  name: string;
-  email: string;
-  password: string;
-  phone: string;
-  role: UserType;
-  [key: string]: any;
-}
+
 
 const validationRules: ValidationRules = {
   name: { required: true, minLength: 2 },
