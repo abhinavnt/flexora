@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { verifyOtp } from "@/services/authService";
+import { resendOtp, verifyOtp } from "@/services/authService";
 import { MAX_TIMER_PERSISTENCE_MINUTES, OTP_LENGTH, RESEND_TIME_SECONDS } from "@/utils/auth/otpUtils";
 
 export function useOtp(email: string) {
@@ -118,8 +118,9 @@ export function useOtp(email: string) {
     }
   };
 
-  const handleResendOtp = () => {
+  const handleResendOtp = async() => {
     setOtp(new Array(OTP_LENGTH).fill(""));
+    await resendOtp(email)
     startTimer();
   };
 

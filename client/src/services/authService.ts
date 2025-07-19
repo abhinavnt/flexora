@@ -1,4 +1,5 @@
-import type { RegistrationFormData } from "@/components/auth/RegistrationForm";
+
+import type { RegistrationFormData } from "@/hooks/auth/useRegistrationForm";
 import { setCredentials } from "@/redux/features/auth/AuthSlice";
 import type { AppDispatch } from "@/redux/store";
 import axiosInstance from "@/utils/axiosInstance";
