@@ -1,24 +1,21 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
+import { useSelector } from 'react-redux';
+import { Button } from "@/components/ui/button";
+import { useState, useMemo } from "react";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Search, SlidersHorizontal, ChevronDown, ArrowRight } from "lucide-react";
+import { motion, type Variants } from "framer-motion";
+import { ThemeProvider } from "@/hooks/ThemeProvider";
+import { JobCard } from "./Job-card";
+import { Link } from "react-router-dom";
+import type { RootState } from '@/redux/store';
 
-import { useState, useMemo } from "react"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Label } from "@/components/ui/label"
-import { Search, SlidersHorizontal, ChevronDown, ArrowRight } from "lucide-react"
-
-import { motion, type Variants } from "framer-motion" 
-import { ThemeProvider } from "@/hooks/ThemeProvider"
-import { Header } from "@/components/layout/Navbar"
-import { JobCard } from "./Job-card"
-import { Link } from "react-router-dom"
-import { Footer } from "@/components/layout/Footer"
-import { LocationModal } from "./Location-modal"
-
-// Mock Job Data (Updated for Indian context and more specific pay ranges)
+// Unchanged: Mock Job Data
 const mockJobs = [
   {
     id: "1",
@@ -107,7 +104,7 @@ const mockJobs = [
     pay: "₹1000/day",
     location: "Kochi, Kerala",
     dateTime: "Full-time, Mon-Sat",
-    category: "Food Service", 
+    category: "Food Service",
     payRange: "₹1000-2000/day",
   },
   {
@@ -120,7 +117,7 @@ const mockJobs = [
     category: "Design",
     payRange: "₹200-300/hour",
   },
-]
+];
 
 const categories = [
   "Retail",
@@ -132,97 +129,79 @@ const categories = [
   "Admin",
   "Education",
   "Design",
-]
-const payRanges = ["₹100-200/day", "₹200-300/day", "₹100-200/hour", "₹200-300/hour"]
+];
+const payRanges = ["₹100-200/day", "₹200-300/day", "₹100-200/hour", "₹200-300/hour"];
 
 export default function JobSeekerHomePage() {
   return (
     <ThemeProvider>
       <JobSeekerHomeContent />
     </ThemeProvider>
-  )
+  );
 }
 
 function JobSeekerHomeContent() {
-  const userName = "John" 
+  const userName = "John";
+  const currentLocation = useSelector((state: RootState) => state.location.currentLocation);
 
-  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false)
-  const [currentLocation, setCurrentLocation] = useState("Kochi, Kerala") 
-
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([])
-  const [selectedPayRanges, setSelectedPayRanges] = useState<string[]>([])
-  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false) 
-
-  const handleLocationSelect = (location: string) => {
-    setCurrentLocation(location)
-  }
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedPayRanges, setSelectedPayRanges] = useState<string[]>([]);
+  const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
   const handleSelectCategory = (category: string) => {
     setSelectedCategories((prev) =>
-      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category],
-    )
-  }
+      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
+    );
+  };
 
   const handleSelectPayRange = (range: string) => {
-    setSelectedPayRanges((prev) => (prev.includes(range) ? prev.filter((r) => r !== range) : [...prev, range]))
-  }
+    setSelectedPayRanges((prev) =>
+      prev.includes(range) ? prev.filter((r) => r !== range) : [...prev, range]
+    );
+  };
 
   const handleClearFilters = () => {
-    setSelectedCategories([])
-    setSelectedPayRanges([])
-  }
+    setSelectedCategories([]);
+    setSelectedPayRanges([]);
+  };
 
   const filteredJobs = useMemo(() => {
     return mockJobs.filter((job) => {
       const matchesSearch =
         job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         job.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.employer.toLowerCase().includes(searchQuery.toLowerCase())
+        job.employer.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(job.category)
-      const matchesPayRange = selectedPayRanges.length === 0 || selectedPayRanges.includes(job.payRange)
+      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(job.category);
+      const matchesPayRange = selectedPayRanges.length === 0 || selectedPayRanges.includes(job.payRange);
+      const matchesLocation = job.location.includes(currentLocation) || job.location.includes("Remote (India)");
 
-      // Match jobs in the selected city/state or remote jobs
-      const matchesLocation = job.location.includes(currentLocation) || job.location.includes("Remote (India)")
+      return matchesSearch && matchesCategory && matchesPayRange && matchesLocation;
+    });
+  }, [searchQuery, selectedCategories, selectedPayRanges, currentLocation]);
 
-      return matchesSearch && matchesCategory && matchesPayRange && matchesLocation
-    })
-  }, [searchQuery, selectedCategories, selectedPayRanges, currentLocation])
-
-  // Framer Motion variants for animations
+  // Unchanged: Animation variants
   const containerVariants: Variants = {
-    // Explicitly type as Variants
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.1, // Stagger children animations by 0.1 seconds
-      },
+      transition: { staggerChildren: 0.1 },
     },
-  }
+  };
 
   const itemVariants: Variants = {
-    // Explicitly type as Variants
-    hidden: { y: 50, opacity: 0 }, // Start 50px below and invisible
+    hidden: { y: 50, opacity: 0 },
     visible: {
-      y: 0, // End at original Y position
-      opacity: 1, // End fully visible
-      transition: {
-        type: "spring", // Use a spring animation for a natural feel
-        stiffness: 100,
-        damping: 15,
-      },
+      y: 0,
+      opacity: 1,
+      transition: { type: "spring", stiffness: 100, damping: 15 },
     },
-  }
+  };
 
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
-      {/* Header Component */}
-      <Header currentLocation={currentLocation} setIsLocationModalOpen={setIsLocationModalOpen} />
-
+    <div className="flex flex-col">
       <main className="flex-1">
-        {/* Hero Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 text-center bg-gradient-to-b from-background to-muted/50 relative overflow-hidden">
           <div
             className="absolute inset-0 opacity-10 dark:opacity-5"
@@ -252,7 +231,6 @@ function JobSeekerHomeContent() {
           </div>
         </section>
 
-        {/* Search & Filter Section */}
         <section className="w-full py-8 md:py-12 bg-muted/50 dark:bg-muted/20">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col md:flex-row items-center justify-center gap-4 mb-4">
@@ -266,7 +244,6 @@ function JobSeekerHomeContent() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              {/* Mobile Filters Trigger */}
               <Collapsible
                 open={isMobileFiltersOpen}
                 onOpenChange={setIsMobileFiltersOpen}
@@ -286,7 +263,7 @@ function JobSeekerHomeContent() {
                     />
                   </Button>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="mt-4 bg-background border rounded-md shadow-lg p-4 z-10 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down">
+                <CollapsibleContent className="mt-4 bg-background border rounded-md shadow-lg p-4 z-10">
                   <div className="space-y-4">
                     <div>
                       <h3 className="font-semibold text-base mb-2">Category</h3>
@@ -295,7 +272,7 @@ function JobSeekerHomeContent() {
                           <Badge
                             key={category}
                             variant={selectedCategories.includes(category) ? "default" : "secondary"}
-                            className="cursor-pointer px-3 py-1.5 hover:bg-primary hover:text-primary-foreground transition-colors"
+                            className="cursor-pointer px-3 py-1.5 hover:bg-primary hover:text-primary-foreground"
                             onClick={() => handleSelectCategory(category)}
                           >
                             {category}
@@ -310,7 +287,7 @@ function JobSeekerHomeContent() {
                           <Badge
                             key={range}
                             variant={selectedPayRanges.includes(range) ? "default" : "secondary"}
-                            className="cursor-pointer px-3 py-1.5 hover:bg-primary hover:text-primary-foreground transition-colors"
+                            className="cursor-pointer px-3 py-1.5 hover:bg-primary hover:text-primary-foreground"
                             onClick={() => handleSelectPayRange(range)}
                           >
                             {range}
@@ -318,7 +295,7 @@ function JobSeekerHomeContent() {
                         ))}
                       </div>
                     </div>
-                    <Button variant="outline" onClick={handleClearFilters} className="w-full mt-2 bg-transparent">
+                    <Button variant="outline" onClick={handleClearFilters} className="w-full bg-transparent">
                       Reset Filters
                     </Button>
                   </div>
@@ -328,10 +305,8 @@ function JobSeekerHomeContent() {
           </div>
         </section>
 
-        {/* Job Listings Section with Desktop Filters */}
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6 grid md:grid-cols-[240px_1fr] lg:grid-cols-[280px_1fr] gap-8">
-            {/* Desktop Filters Sidebar */}
             <div className="hidden md:block sticky top-24 h-fit p-4 border rounded-lg shadow-sm bg-background">
               <h2 className="text-xl font-bold mb-4">Filters</h2>
               <div className="space-y-6">
@@ -375,7 +350,6 @@ function JobSeekerHomeContent() {
               </div>
             </div>
 
-            {/* Job Listings */}
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center md:text-left">Available Jobs</h2>
               {filteredJobs.length > 0 ? (
@@ -383,8 +357,8 @@ function JobSeekerHomeContent() {
                   className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
                   variants={containerVariants}
                   initial="hidden"
-                  whileInView="visible" 
-                  viewport={{ once: true, amount: 0.2 }} 
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.2 }}
                 >
                   {filteredJobs.slice(0, 6).map((job) => (
                     <JobCard key={job.id} job={job} variants={itemVariants} />
@@ -393,7 +367,6 @@ function JobSeekerHomeContent() {
               ) : (
                 <p className="text-center text-muted-foreground text-lg">No jobs found matching your criteria.</p>
               )}
-              {/* Explore All Button */}
               {filteredJobs.length > 6 && (
                 <div className="flex justify-center mt-8">
                   <Button asChild variant="outline" size="lg">
@@ -408,17 +381,6 @@ function JobSeekerHomeContent() {
           </div>
         </section>
       </main>
-
-      {/* Footer Component */}
-      <Footer />
-
-      {/* Location Modal */}
-      <LocationModal
-        isOpen={isLocationModalOpen}
-        onClose={() => setIsLocationModalOpen(false)}
-        onLocationSelect={handleLocationSelect}
-        currentLocation={currentLocation}
-      />
     </div>
-  )
+  );
 }

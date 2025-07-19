@@ -1,18 +1,19 @@
-"use client"
+"use client";
 
-
-import { Button } from "@/components/ui/button"
-import { useTheme } from "@/hooks/ThemeProvider"
-import { Briefcase, MapPin, User, Sun, Moon } from "lucide-react"
-import { Link } from "react-router-dom"
+import { useSelector } from 'react-redux';
+import { Button } from "@/components/ui/button";
+import { useTheme } from "@/hooks/ThemeProvider";
+import { Briefcase, MapPin, User, Sun, Moon } from "lucide-react";
+import { Link } from "react-router-dom";
+import type { RootState } from '@/redux/store';
 
 interface HeaderProps {
-  currentLocation: string
-  setIsLocationModalOpen: (isOpen: boolean) => void
+  setIsLocationModalOpen: (isOpen: boolean) => void;
 }
 
-export function Header({ currentLocation, setIsLocationModalOpen }: HeaderProps) {
-  const { theme, toggleTheme } = useTheme()
+export function Header({ setIsLocationModalOpen }: HeaderProps) {
+  const { theme, toggleTheme } = useTheme();
+  const currentLocation = useSelector((state: RootState) => state.location.currentLocation);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/90 backdrop-blur-sm px-4 md:px-6 py-3 flex items-center justify-between">
@@ -44,5 +45,5 @@ export function Header({ currentLocation, setIsLocationModalOpen }: HeaderProps)
         </Button>
       </div>
     </header>
-  )
+  );
 }

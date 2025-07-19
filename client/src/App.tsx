@@ -1,12 +1,12 @@
 
 // const queryClient = new QueryClient();
 
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Routes } from "react-router-dom";
 import { ThemeProvider } from "../../client/src/hooks/ThemeProvider";
-import AuthPage from "./pages/Auth/AuthPage";
-import OtpPage from "./pages/Auth/OTP-page";
-import JobSeekerHomePage from "./components/users/home/Seeker-home";
-import EmployerHomePage from "./components/employer/home/Employer-home-page";
+
+import { AuthRoutes } from "./routes/AuthRoutes";
+import { JobSeekerRoutes } from "./routes/JobSeekerRoutes";
+import { EmployerRoutes } from "./routes/EmployerRoutes";
 
 const App = () => (
   // <QueryClientProvider client={queryClient}>
@@ -14,10 +14,9 @@ const App = () => (
 
     <BrowserRouter>
       <Routes>
-        <Route path="/auth" element={<AuthPage />} />
-        <Route path="/otp" element={<OtpPage/>}/>
-        <Route path="/" element={<JobSeekerHomePage/>}/>
-        <Route path="/employer" element={<EmployerHomePage/>}/>
+        {AuthRoutes}
+        {JobSeekerRoutes}
+        {EmployerRoutes}
       </Routes>
     </BrowserRouter>
   </ThemeProvider>

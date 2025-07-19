@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,20 +8,20 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Search } from "lucide-react"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Search } from "lucide-react";
 
 interface LocationModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onLocationSelect: (location: string) => void
-  currentLocation: string
+  isOpen: boolean;
+  onClose: () => void;
+  onLocationSelect: (location: string) => void;
+  currentLocation: string;
 }
 
-// Expanded dummy data for Indian cities/states, focusing on Kerala
+// Unchanged: Dummy data
 const dummyLocations = [
   "Kochi, Kerala",
   "Thiruvananthapuram, Kerala",
@@ -42,38 +42,26 @@ const dummyLocations = [
   "Jaipur, Rajasthan",
   "Lucknow, Uttar Pradesh",
   "Chandigarh, Punjab",
-]
+];
 
+// Changed: No significant logic changes, just ensuring it works with Layout
 export function LocationModal({ isOpen, onClose, onLocationSelect, currentLocation }: LocationModalProps) {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedLocation, setSelectedLocation] = useState(currentLocation)
-  const [locations, setLocations] = useState<string[]>(dummyLocations) // State to hold locations, could be from API
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState(currentLocation);
+  const [locations, setLocations] = useState<string[]>(dummyLocations);
 
-  // Simulate API call for locations
   useEffect(() => {
     if (isOpen) {
-      // In a real app, you'd fetch from an API here.
-      // Example using a Next.js Route Handler:
-      // const fetchLocations = async () => {
-      //   try {
-      //     const response = await fetch(`/api/locations?q=${encodeURIComponent(searchQuery)}`);
-      //     const data = await response.json();
-      //     setLocations(data);
-      //   } catch (error) {
-      //     console.error("Failed to fetch locations:", error);
-      //   }
-      // };
-      // fetchLocations();
-      // For now, we filter dummy data
-      setLocations(dummyLocations.filter((loc) => loc.toLowerCase().includes(searchQuery.toLowerCase())))
+      setLocations(dummyLocations.filter((loc) => loc.toLowerCase().includes(searchQuery.toLowerCase())));
     }
-  }, [isOpen, searchQuery]) // Re-run when modal opens or search query changes
+  }, [isOpen, searchQuery]);
 
   const handleConfirm = () => {
-    onLocationSelect(selectedLocation)
-    onClose()
-  }
+    onLocationSelect(selectedLocation);
+    onClose();
+  };
 
+  // Unchanged: Rest of the component logic
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px] p-6">
@@ -118,5 +106,5 @@ export function LocationModal({ isOpen, onClose, onLocationSelect, currentLocati
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

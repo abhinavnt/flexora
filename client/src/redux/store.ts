@@ -1,10 +1,12 @@
 import { useDispatch, useSelector, type TypedUseSelectorHook } from "react-redux";
 import { configureStore } from "@reduxjs/toolkit"
 import authReducer from "./features/auth/AuthSlice"
+import locationReducer from "./features/LocationSlice";
 
 export const store = configureStore({
   reducer: {
     auth:authReducer,
+    location: locationReducer,
   },
 })
 

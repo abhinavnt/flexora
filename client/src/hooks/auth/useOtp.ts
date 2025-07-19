@@ -109,6 +109,8 @@ export function useOtp(email: string) {
         localStorage.removeItem("otpTimerEndTime");
         if (response.data.user.role === "user") {
           navigate("/");
+        }else{
+          navigate("/employer")
         }
       } else {
         setHasError(true);
