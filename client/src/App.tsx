@@ -6,6 +6,7 @@ import { ThemeProvider } from "../../client/src/hooks/ThemeProvider";
 import AuthPage from "./pages/Auth/AuthPage";
 import OtpPage from "./pages/Auth/OTP-page";
 import JobSeekerHomePage from "./components/users/home/Seeker-home";
+import EmployerHomePage from "./components/employer/home/Employer-home-page";
 
 const App = () => (
   // <QueryClientProvider client={queryClient}>
@@ -16,6 +17,7 @@ const App = () => (
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/otp" element={<OtpPage/>}/>
         <Route path="/" element={<JobSeekerHomePage/>}/>
+        <Route path="/employer" element={<EmployerHomePage/>}/>
       </Routes>
     </BrowserRouter>
   </ThemeProvider>
