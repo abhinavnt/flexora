@@ -22,7 +22,7 @@ export default function AuthPage() {
 
   // Redirect authenticated users based on role
   if (isAuthenticated) {
-    if (user?.role === "jobseeker") {
+    if (user?.role === "user") {
       return <Navigate to="/" replace />;
     } else if (user?.role === "employer") {
       return <Navigate to="/employer" replace />;
@@ -39,7 +39,7 @@ export default function AuthPage() {
       const response = await login(data.email, data.password, dispatch);
       console.log("Login data:", data);
       if (response.status === 200) {
-        if (response.data.user.role === "jobseeker") {
+        if (response.data.user.role === "user") {
           navigate("/");
         } else if (response.data.user.role === "employer") {
           navigate("/employer");
