@@ -1,6 +1,7 @@
 
 import { useState } from "react"
 import { useFormValidation, type ValidationRules } from "../../hooks/useFormValidation"
+import type { LoginFormData } from "@/types/auth"
 
 const validationRules: ValidationRules = {
   email: {
@@ -13,10 +14,7 @@ const validationRules: ValidationRules = {
   },
 }
 
-export interface LoginFormData {
-  email: string
-  password: string
-}
+
 
 export function useLoginForm(onSubmit: (data: LoginFormData) => Promise<void>) {
   const [formData, setFormData] = useState<LoginFormData>({ email: "", password: "" })

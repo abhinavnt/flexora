@@ -6,11 +6,11 @@ import { ThemeToggle } from "@/components/ui/ThemeToggle"
 import { LoginForm } from "@/components/auth/LoginForm"
 import { login, registerUser } from "@/services/authService"
 import { useNavigate } from "react-router-dom"
-import type { RegistrationFormData } from "@/hooks/auth/useRegistrationForm"
 import { RegistrationForm } from "@/components/auth/RegistrationForm"
 import { useDispatch } from "react-redux"
+import type { AuthMode, RegistrationFormData } from "@/types/auth"
 
-type AuthMode = "login" | "register"
+
 
 export default function AuthPage() {
   const [authMode, setAuthMode] = useState<AuthMode>("login")

@@ -8,14 +8,11 @@ import { RegistrationCommonFields } from "./register/RegistrationCommonFields";
 import { RegistrationUserFields } from "./register/RegistrationUserFields";
 import { RegistrationEmployerFields } from "./register/RegistrationEmployerFields";
 import { RegistrationLocationFields } from "./register/RegistrationLocationFields";
+import type { RegistorProps } from "@/types/auth";
 
-interface Props {
-  onSubmit: (data: any) => Promise<void>;
-  loading?: boolean;
-  error?: string;
-}
 
-export function RegistrationForm({ onSubmit, loading = false, error }: Props) {
+
+export function RegistrationForm({ onSubmit, loading = false, error }: RegistorProps) {
   const {
     formData,
     userType,

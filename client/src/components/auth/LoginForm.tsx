@@ -4,13 +4,10 @@ import { motion } from "framer-motion"
 import { Mail, Lock, LogIn } from "lucide-react"
 import { InputField } from "../ui/input-field"
 import { GoogleIcon } from "../ui/GoogleIcon"
-import { useLoginForm, type LoginFormData } from "@/hooks/auth/useLoginForm"
+import type { LoginFormProps } from "@/types/auth"
+import { useLoginForm } from "@/hooks/auth/useLoginForm"
 
-interface LoginFormProps {
-  onSubmit: (data: LoginFormData) => Promise<void>
-  loading?: boolean
-  error?: string
-}
+
 
 export function LoginForm({ onSubmit, loading = false, error }: LoginFormProps) {
   const { formData, errors, handleInputChange, handleInputBlur, handleSubmit } = useLoginForm(onSubmit)
