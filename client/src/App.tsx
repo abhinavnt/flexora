@@ -11,6 +11,7 @@ import { refreshToken } from "./services/authService";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useAppSelector } from "./redux/store";
+import LoadingFlexora from "./components/ui/loading-flexora";
 
 function App (){
 const [loading, setLoading] = useState<boolean>(true);
@@ -37,7 +38,7 @@ const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
         } finally {
           setTimeout(() => {
             setLoading(false);
-          }, 2000);
+          }, 5000);
         }
       } else {
         setLoading(false);
@@ -48,11 +49,7 @@ const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
 
  if (loading) {
-  return (
-    <div className="flex bg-black items-center justify-center h-screen">
-      {/* <Loading variant="ripple"  /> */}
-    </div>
-  );
+  return <LoadingFlexora/>
 }
 
 
