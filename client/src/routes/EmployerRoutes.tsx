@@ -1,7 +1,9 @@
-import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
-import EmployerHomePage from '@/components/employer/home/Employer-home-page';
-import { Layout } from '@/components/layout/Layout';
 import { Route } from 'react-router-dom';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { Layout } from '@/components/layout/Layout';
+import EmployerHomePage from '@/components/employer/home/Employer-home-page';
+import { Outlet } from 'react-router-dom';
+import { PostJobForm } from '@/components/employer/job/Post-job-form';
 
 export const EmployerRoutes = (
   <Route
@@ -9,9 +11,12 @@ export const EmployerRoutes = (
     element={
       <ProtectedRoute allowedRole="employer">
         <Layout>
-          <EmployerHomePage />
+          <Outlet />
         </Layout>
       </ProtectedRoute>
     }
-  />
+  >
+    <Route index element={<EmployerHomePage />} />
+    <Route path="postjob" element={<PostJobForm />} />
+  </Route>
 );
