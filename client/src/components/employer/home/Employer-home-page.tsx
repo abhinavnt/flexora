@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { motion, type Variants } from "framer-motion";
 import { JobCard } from "./My-job-card";
+import { Link } from "react-router-dom";
 
 type Job = {
   id: string;
@@ -74,10 +75,12 @@ export default function EmployerHomePage() {
           </motion.div>
 
           <div className="fixed bottom-4 right-4 md:static md:mt-8 md:flex md:justify-center">
+            <Link to='postjob'>
             <Button size="lg" className="w-auto px-6 py-3 text-lg shadow-lg md:w-fit">
               <Plus className="h-5 w-5 mr-2" />
               Post a Job
             </Button>
+            </Link>
           </div>
         </section>
       </main>
